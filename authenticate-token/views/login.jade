@@ -1,0 +1,14 @@
+extends layout
+block content
+  h1= title
+  lable Token
+  br
+  div #{token}
+  form(action="/login" method="post")
+    .row
+      label Name
+      input#user(name="user")
+    .row
+      label PWD
+      input#pwd(name="pwd")
+    button Submit
