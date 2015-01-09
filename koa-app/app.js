@@ -1,11 +1,19 @@
 "use strict";
 var app = module.exports = require('koa')();
 var favicon = require('koa-favicon'),
-  router = require('koa-route'),
   logger = require('koa-logger'),
+  mount = require('koa-mount'),
   session = require('koa-generic-session'),
-  userauth = require('koa-userauth'),
+  serve = require('koa-static'),
+  debug = require('debug')('koa-jenkins'),
   redisStore = require('koa-redis');
+
+// biz-module
+var bizModule = require('./biz-module-initializer'),
+  home = require('./biz-module/home'),
+  login = require('./biz-module/login'),
+  userauth = require('./biz-module/auth');
+
 
 
 app.keys = ["I'm a key"];
@@ -15,29 +23,14 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(session({
   //store: redisStore()
 }));
-// User Auth
-app.use(userauth({
-  match: '',
-  // auth system login url
-  loginURLFormater: function (url,rootPath) {
-    return '/login?redirect=' + url;
-  },
-  // login callback and getUser info handler
-  getUser: function* (ctx) {
-    var token = ctx.query.token;
-    // get user
-    return null;
-  }
-}));
+// Auth
+app.use(bizModule['auth']());
+app.use(serve(__dirname + '/public'));
 
-
-app.use(function * (next) {
-  this.body = "Hello World";
-  var session = this.session;
-  session.abc = "abc";
-  session.ad = "ad";
-  yield next;
-});
+//mount
+app.use(mount('/', bizModule['home']));
+app.use(mount('/login', bizModule['login']));
+app.use(bizModule['404']);
 
 
 if (!module.parent) {
