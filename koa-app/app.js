@@ -9,10 +9,7 @@ var favicon = require('koa-favicon'),
   redisStore = require('koa-redis');
 
 // biz-module
-var bizModule = require('./biz-module-initializer'),
-  home = require('./biz-module/home'),
-  login = require('./biz-module/login'),
-  userauth = require('./biz-module/auth');
+var bizModule = require('./biz-module-initializer');
 
 
 
