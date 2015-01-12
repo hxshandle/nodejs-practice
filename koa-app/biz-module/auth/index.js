@@ -12,7 +12,7 @@ var debug = require('debug')('koa-jenkins:auth'),
     loginPath: '/login',
     logoutPath: '/logout',
     match: '',
-    ignore:'404.html'
+    ignore:'/404.html'
   };
 
 var needLogin = route(defaultOptions.match);
@@ -21,6 +21,18 @@ module.exports = function(options) {
   options = options || {};
   copy(defaultOptions).to(options);
 
+  function isIgnorePath(path){
+    var ret = false;
+    var ignoreList = options.ignore.split(',');
+    for (var i = ignoreList.length - 1; i >= 0; i--) {
+      var p = ignoreList[i];
+      if(path == p){
+        ret = true;
+        break;
+      }
+    };
+    return ret;
+  }
   /**
    * Login flow
    * 1. unauth user will redirect to options.loginPath
@@ -33,6 +45,11 @@ module.exports = function(options) {
 
     if (this.path == options.loginPath) {
       debug('login pass');
+      return yield * next;
+    }
+
+    if(isIgnorePath(this.path)){
+      debug('path %s is a ignore path',this.path);
       return yield * next;
     }
 
@@ -62,6 +79,8 @@ module.exports = function(options) {
 
   }
 }
+
+
 
 /**
  * Send redirect response.
