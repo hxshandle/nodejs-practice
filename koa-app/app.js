@@ -22,7 +22,7 @@ app.use(session({
 }));
 // Auth
 app.use(bizModule['auth']());
-app.use(serve(__dirname + '/public'));
+app.use(serve(__dirname + '/'));
 
 //mount
 app.use(mount('/', bizModule['home']));
